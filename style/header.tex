@@ -1,0 +1,39 @@
+% Header and document class
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[top=0.4in, bottom=0.5in, left=0.5in, right=0.5in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{fontawesome5}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+% Section formatting - small caps, larger and bold
+\titleformat{\section}
+  {\normalfont\scshape\Large\bfseries}
+  {}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{6pt}{6pt}
+
+% Header macro
+\newcommand{\makeheader}{%
+  \begin{center}
+    {\Huge\bfseries Sumit Ranjan Jha}\\
+    \vspace{3mm}
+    {\normalsize
+      \faIcon{linkedin} \href{https://www.linkedin.com/in/sumitranjanjha7/}{LinkedIn} \, | \,
+      \faIcon{github} \href{https://github.com/SumitWiki}{Github} \, | \,
+      \faIcon{phone} +91 6200129832 \, | \,
+      \faIcon{envelope} \href{mailto:sumitjhawiki@gmail.com}{Email}
+    }
+  \end{center}
+  \vspace{-5mm}
+}

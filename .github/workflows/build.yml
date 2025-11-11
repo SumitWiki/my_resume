@@ -1,0 +1,81 @@
+name: Build CV and Deploy
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: "0 0 * * 0" # Auto-run every Sunday at midnight UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to commit built files back to repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install requests
+
+      - name: Run tests
+        run: python tests/test_utils.py
+        continue-on-error: false
+
+      - name: Compile LaTeX to PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: cv.tex
+          latexmk_use_xelatex: false
+          latexmk_shell_escape: false
+
+      - name: Generate JSON Resume
+        run: python scripts/generate_json.py
+
+      - name: Prepare docs folder for Vercel
+        run: |
+          mkdir -p docs
+          cp cv.pdf docs/index.pdf
+
+      - name: Verify generated files
+        run: |
+          echo "Verifying generated files..."
+          ls -lh cv.pdf docs/index.pdf docs/resume.json
+          echo "✓ All files generated successfully"
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-pdf
+          path: cv.pdf
+          retention-days: 90
+
+      - name: Upload all formats artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume-all-formats
+          path: docs/
+          retention-days: 90
+
+      - name: Commit and push built files
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: auto-update resume files [skip ci]"
+            git push
+          fi

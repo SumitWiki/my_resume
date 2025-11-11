@@ -1,0 +1,62 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.toc
+*.lot
+*.lof
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Auto-generated PR info
+sections/latest_pr.tex
+
+# Backup files
+*.backup
+generate_*.py.backup
+
+# Duplicate/temp directories
+scripts/docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Backup files
+*.bak
+*.backup
+*~
+*.py.backup
+*.tex.backup
