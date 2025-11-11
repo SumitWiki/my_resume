@@ -1,12 +1,67 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sumit Jha — Resume</title>
-  <style>html,body{height:100%;margin:0}iframe{border:0;width:100%;height:100vh}</style>
-</head>
-<body>
-  <iframe src="cv.pdf" title="Sumit Jha — Resume"></iframe>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sumit Jha — Resume</title>
+    <link rel="stylesheet" href="/docs/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <h1>Sumit Jha</h1>
+          <p class="tag">Software Engineer — Open Source & Resume</p>
+        </div>
+        <nav class="top-nav">
+          <a href="#about">About</a>
+          <a href="#resume">Resume</a>
+          <a href="#contact">Contact</a>
+          <a class="btn" href="cv.pdf" target="_blank" rel="noopener">Download PDF</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container main-grid">
+      <aside class="sidebar">
+        <section id="about">
+          <h2>About</h2>
+          <p>Hi — I'm Sumit. I build dependable systems and elegant tooling. This page hosts my LaTeX resume as a PDF and provides an HTML-friendly view for quick browsing.</p>
+        </section>
+
+        <section id="skills">
+          <h3>Skills</h3>
+          <ul>
+            <li>Python, TypeScript</li>
+            <li>LaTeX, Documentation</li>
+            <li>CI, Automation</li>
+          </ul>
+        </section>
+
+        <section id="contact">
+          <h3>Contact</h3>
+          <p>Email: <a href="mailto:sumit@example.com">sumit@example.com</a></p>
+          <p>Website: <a href="https://sumitjha.me">sumitjha.me</a></p>
+        </section>
+      </aside>
+
+      <section class="content" id="resume">
+        <div class="pdf-wrap">
+          <iframe src="cv.pdf" title="Sumit Jha — Resume" frameborder="0" loading="lazy"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year"></span> Sumit Jha — Built with LaTeX • Hosted on GitHub Pages</div>
+    </footer>
+
+    <script>
+      // set year
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+  </body>
 </html>
