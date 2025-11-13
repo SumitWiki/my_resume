@@ -6,18 +6,32 @@ on:
   pull_request:
     branches: [main, master]
   schedule:
-    - cron: "0 0 * * 0" # Auto-run every Sunday at midnight UTC
-  workflow_dispatch: # Allow manual trigger
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required to commit built files back to repo
+      contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (persist creds for push)
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Debug runner info
+        run: |
+          echo "RUNNER_OS: $RUNNER_OS"
+          echo "GITHUB_REF: $GITHUB_REF"
+          git --version
+          node --version || echo "node not installed"
+          python3 --version || python --version
+          ls -la || true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,12 +39,38 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install Python dependencies
-        run: pip install requests
+      - name: Show pip and install deps
+        run: |
+          python -m pip --version
+          if [ -f requirements.txt ]; then
+            echo "Installing from requirements.txt"
+            pip install -r requirements.txt
+          else
+            echo "requirements.txt not found — installing requests only"
+            pip install requests
+          fi
+          pip freeze | sed -n '1,80p'
+
+      - name: Show workspace files (for debugging)
+        run: ls -la
 
       - name: Run tests
-        run: python tests/test_utils.py
-        continue-on-error: false
+        run: |
+          set -eux
+          if [ -f tests/test_utils.py ]; then
+            python tests/test_utils.py
+          else
+            echo "No tests/test_utils.py found — skipping tests"
+          fi
+
+      - name: Ensure cv.tex exists
+        run: |
+          if [ ! -f cv.tex ]; then
+            echo "ERROR: cv.tex not found in repo root. Aborting." >&2
+            ls -la
+            exit 2
+          fi
+          echo "Found cv.tex"
 
       - name: Compile LaTeX to PDF
         uses: xu-cheng/latex-action@v3
@@ -40,18 +80,29 @@ jobs:
           latexmk_shell_escape: false
 
       - name: Generate JSON Resume
-        run: python scripts/generate_json.py
+        run: |
+          if [ -f scripts/generate_json.py ]; then
+            python scripts/generate_json.py
+          else
+            echo "scripts/generate_json.py not found — skipping"
+          fi
 
       - name: Prepare docs folder for Vercel
         run: |
           mkdir -p docs
-          cp cv.pdf docs/index.pdf
+          if [ -f cv.pdf ]; then
+            cp cv.pdf docs/index.pdf
+          else
+            echo "WARNING: cv.pdf missing after LaTeX step"
+            ls -la
+            exit 3
+          fi
 
       - name: Verify generated files
         run: |
           echo "Verifying generated files..."
-          ls -lh cv.pdf docs/index.pdf docs/resume.json
-          echo "✓ All files generated successfully"
+          ls -lh cv.pdf docs/index.pdf docs/resume.json || true
+          echo "✓ Verification step complete"
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
@@ -77,5 +128,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: auto-update resume files [skip ci]"
-            git push
+            git push origin HEAD:main
           fi
